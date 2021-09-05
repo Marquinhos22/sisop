@@ -21,7 +21,7 @@ fi
 }
 
 validarParametros(){
-echo $1 $2 $3
+#echo $1 $2 $3
 if [[ ! ($1 == "-n1" && $2 == "-n2" && ( $3 == "-suma" || $3 == "-resta" || $3 == "-division" || $3 == "-multiplicacion")) ]]
 then
 	echo "Error en los parametros. Para consultar la ayuda utilice -h, -? o -help"
@@ -29,10 +29,33 @@ then
 	exit 1
 fi
 }
+
 suma() {
-	echo "TORO"
-	echo $n1
-	echo $n2
+	res=`echo "scale=4; ($n1)+($n2)" | bc`
+	echo "$n1 + $n2 = $res" 
+	exit 1;
+}
+
+resta() {
+	echo "Se restaran $n1 y $n2"
+	echo "scale=4; ($n1)-($n2)" | bc
+	exit 1;
+}
+
+multiplicacion() {
+	echo "Se multiplicaran $n1 y $n2"
+	echo "scale=4; ($n1)*($n2)" | bc
+	exit 1;
+}
+
+division() {
+	if [[ `bc <<< "$n2==0"` ]]; then
+		echo "No se puede dividir por 0"
+		exit 1;
+	fi
+
+	echo "Se hara el cociente entre $n1 y $n2"
+	echo "scale=4; ($n1)/($n2)" | bc
 	exit 1;
 }
 ########################## FIN FUNCIONES ######################

@@ -70,13 +70,6 @@ fi
 }
 
 validarParametros() {	#Aquí se verifica que primero se pasen los operandos y luego el tipo de operacion a realizar sobre ellos.
-#if [[ ! ($1 == "-n1" && $2 == "-n2" && ( $3 == "-suma" || $3 == "-resta" || $3 == "-division" || $3 == "-multiplicacion")) ]]
-#then
-#	echo "Error en los parametros. Para consultar la ayuda utilice -h, -? o -help"
-#	echo "$uso"
-#	exit 1;
-#fi
-
 if [[ ( -z "$1" || -z "$2" ) ]]
 then
 	echo "Error en los parametros. Por favor ingrese la operacion luego de los operandos. Para consultar la ayuda utilice -h, -? o -help"
@@ -136,8 +129,6 @@ then
 		exit 1
 	fi
 fi
-
-#validarParametros $1 $3 $5	
 ########################## FIN VALIDACIONES ######################
 
 ########################## PROGRAMA ##########################

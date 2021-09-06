@@ -1,4 +1,4 @@
-1. El script cuenta la cantidad de subdirectorios existentes en todos los directorios presentes en el directorio enviado por parametro. Luego, crea una lista, la ordena con cierto orden e imprime los primeros X candidatos, siendo X el segundo parametro pasado al script. 
+1. El script cuenta la cantidad de archivos existentes en todos los subdirectorios presentes en el directorio enviado por parametro. Luego, crea una lista, la ordena con cierto orden e imprime los primeros X candidatos, siendo X el segundo parametro pasado al script. 
 El script recibe 2 parametros: un directorio y un numero entero
 4. Las funciones funcA, funcB y funcC se deberian llamar validar help, error y validarParametros respectivamente
 5. Agregaria la validacion del segundo parametro para verificar que sea un numero entero. Ademas, le pasaria el parametro que contiene el directorio a funcB de la siguiente manera: funcB $2. Por otro lado, ante cualquier error en los parametros correspondiente al uso del script, deberia llamar a funcA para explicar dicho uso. Por ultimo, tanto funcA como funcB deberian finalizar con 'exit 1'.

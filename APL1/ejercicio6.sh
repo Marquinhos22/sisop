@@ -66,26 +66,25 @@ suma() {
 }
 
 resta() {
-	echo "Se restaran $1 y $2"
-	echo "scale=4; ($1)-($2)" | bc
+	res=`echo "scale=4; ($1)-($2)" | bc`
+	echo "$1 - $2 = $res"
 	exit 1;
 }
 
 multiplicacion() {
-	echo "Se multiplicaran $1 y $2"
-	echo "scale=4; ($1)*($2)" | bc
+	res=`echo "scale=4; ($1)*($2)" | bc`
+	echo "$1 * $2 = $res"
 	exit 1;
 }
 
 division() {
-	echo $2
-	if [[ `bc <<< "$2==0"` ]]; then
+	if (( $(echo "$2 == 0" | bc -l) )); then
 		echo "No se puede dividir por 0"
 		exit 1;
 	fi
 
-	echo "Se hara el cociente entre $1 y $2"
-	echo "scale=4; ($1)/($2)" | bc
+	res=`echo "scale=4; ($1)/($2)" | bc`
+	echo "$1 / $2 = $res"
 	exit 1;
 }
 ########################## FIN FUNCIONES ######################

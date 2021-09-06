@@ -3,25 +3,25 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#          Ejercicio Nº 6         #
+	#           ejercicio6.sh         #
 	#                                 #
-	# Cammarano, Pablo            	  #
-	# DNI: 37.686.894                 #
+	# Cammarano, Santiago             #
+	# DNI: 41.582.407                 #
 	#                                 #
-	# De Gaudio, Lucas   		      #
-	# DNI: 37.864.618                 #
+	# Ramos, Marcos Gerardo   	  #
+	# DNI: 1.111.111                #
 	#                                 #
-	# Segura, Lucas             	  #
-	# DNI: 37.981.078                 #
+	# Martes, Lucas             	  #
+	# DNI: 39.348.436                 #
 	#                                 #
-	# Soriano, Gonzalo        	      #
-	# DNI: 37.835.032		          #
-	# 				                  #
-	# Vinograd, Kevin      		      #
-	# DNI: 37.981.754                 #
+	# Rius Conde, Lucio        	  #
+	# DNI: 41.779.534 		  #
+	# 				  #
+	# Sullca, Fernando Willian        #
+	# DNI: 37.841.788		  #
 	#                                 #
-	# 	      1º Presentación         #
+	# 	      1º Presentación     #
 	#                                 #
 	###################################
 

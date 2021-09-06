@@ -1,6 +1,32 @@
 #!/bin/bash
 
-#ENCABEZADO
+	###################################
+	#                                 #
+	#        Trabajo Práctico 1       #
+	#          Ejercicio Nº 6         #
+	#           ejercicio6.sh         #
+	#                                 #
+	# Cammarano, Santiago             #
+	# DNI: 41.582.407                 #
+	#                                 #
+	# Ramos, Marcos Gerardo   	  #
+	# DNI: 1.111.111                #
+	#                                 #
+	# Martes, Lucas             	  #
+	# DNI: 39.348.436                 #
+	#                                 #
+	# Rius Conde, Lucio        	  #
+	# DNI: 41.779.534 		  #
+	# 				  #
+	# Sullca, Fernando Willian        #
+	# DNI: 37.841.788		  #
+	#                                 #
+	# 	      1º Presentación     #
+	#                                 #
+	###################################
+
+# El objetivo de este script es el de proveer al usuario con una calculadora capaz de realizar las operaciones matemáticas simples
+# Ejemplo: bash ejercicio6.sh -n1 2 -n2 1 -division	# En este caso se realizará 2/1 y se mostrará "1" como resultado
 
 ########################## AYUDA ##########################
 ayuda="
@@ -25,7 +51,7 @@ uso="Uso del script: ./ejercicio6.sh <-n1 nnnn -n2 nnnn -suma | -resta | -multip
 ########################## FIN AYUDA ######################
 
 ########################## FUNCIONES ##########################
-validarNumeroReal() {
+validarNumeroReal() {	#Aquí se verifica que los parametros correspondientes a los operandos de las operaciones sean numeros reales.
 #reg="^-?(0|[1-9]\d*)(\.\d+)?$"
 #reg2="^(-?[1-9]+\\d*([.]\\d+)?)$|^(-?0[.]\\d*[1-9]+)$|^0$"
 #reg3="^([-+]?([0-9]+)(\.[0-9]+)?)$'"
@@ -43,7 +69,7 @@ fi
 
 }
 
-validarParametros() {
+validarParametros() {	#Aquí se verifica que primero se pasen los operandos y luego el tipo de operacion a realizar sobre ellos.
 #if [[ ! ($1 == "-n1" && $2 == "-n2" && ( $3 == "-suma" || $3 == "-resta" || $3 == "-division" || $3 == "-multiplicacion")) ]]
 #then
 #	echo "Error en los parametros. Para consultar la ayuda utilice -h, -? o -help"

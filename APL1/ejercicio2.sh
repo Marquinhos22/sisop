@@ -4,15 +4,15 @@
 	#                                 #
 	#        Trabajo Práctico 1       #
 	#          Ejercicio Nº 2         #
-	#           ejercicio6.sh         #
+	#           ejercicio2.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
 	#                                 #
 	# Ramos, Marcos Gerardo   	      #
-	# DNI: 1.111.111                  #
+	# DNI: 11.111.111                 #
 	#                                 #
-	# Martes, Lucas             	  #
+	# Martel, Lucas             	  #
 	# DNI: 39.348.436                 #
 	#                                 #
 	# Rius Conde, Lucio        	  	  #
@@ -21,22 +21,25 @@
 	# Sullca, Fernando Willian        #
 	# DNI: 37.841.788		  	      #
 	#                                 #
-	# 	      1º Presentación     	  #
+	# 	      1º Entrega     	  	  #
 	#                                 #
 	###################################
 
-################################## AYUDA ##################################
+# ---------------------------------- AYUDA ----------------------------------
 ayuda="
 Ayuda correspondiente al script ejercicio2.sh
+
 #OBJETIVO PRINCIPAL#
 Este script permite renombrar los archivos (en formato .jpg que sigan una determinada estructura en su nombre) presentes en el directorio pasado por parametro.
 El script admite un parametro obligatorio que es la ruta del directorio y un parametro opcional que es el nombre de un dia para el cual no se quieren renombrar los archivos.
 
-#USO Y PARAMETROS#
-Uso: ./ejercicio2.sh <-p [-d]> 
-Donde:
--p, --path: directoro donde se encuentran las imagenes.
-[-d, --dia]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+#USO#
+Uso: ./ejercicio2.sh <-p [-d]>
+Ejemplo: ./ejercicio2.sh -p APL1/ -d martes
+
+#PARAMETROS#
+    -p, --path: directorio donde se encuentran los archivos.
+    [-d, --dia]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
 
 #ACLARACIONES#
 
@@ -44,9 +47,9 @@ Donde:
 "
 
 uso="Uso del script: ./ejercicio2.sh <-p [-d]>"
-################################## FIN AYUDA ##################################
+# ---------------------------------- FIN AYUDA ----------------------------------
 
-################################## FUNCIONES ##################################
+# ---------------------------------- FUNCIONES ----------------------------------
 # Aqui se valida si el dia de la semana pasado como parametro opcional es valido o no
 validarDiaSemana() {
     semana=(lunes martes miercoles jueves viernes sabado domingo)
@@ -54,24 +57,29 @@ validarDiaSemana() {
     for dia in "${semana[@]}"
     do
         : 
-        if [[ ${1,,} == $dia ]]
-        then
+        if [[ ${1,,} == $dia ]]; then
             flag=1;
         fi
     done
 
-    if [[ $flag != 1 ]]
-        then
+    if [[ $flag != 1 ]]; then
             echo "$1 no es un dia de la semana. Para consultar la ayuda utilice -h, -? o -help"
             exit 1;
     fi
 }
 
-# Aqui se valida si el primer parametro pasado es un directorio o no
+# Aqui se valida el directorio pasado por parametros
 validarDirectorio() {
-    if [[ ! -d $1 ]]
-    then
+    if [[ ! -d $1 ]]; then
         echo "El parametro pasado no es un directorio. Para consultar la ayuda utilice -h, -? o -help"
+        echo "$uso"
+        exit 1;
+    elif [[ ! -e $1 ]]; then
+        echo "No existe la ruta al archivo. Para consultar la ayuda utilice -h, -? o -help"
+        echo "$uso"
+        exit 1;
+    elif [[ ! -r $1 || ! -w $2 ]]; then
+        echo "No se tienen los permisos necesarios sobre el directorio. Para consultar la ayuda utilice -h, -? o -help"
         echo "$uso"
         exit 1;
     fi
@@ -82,18 +90,15 @@ validarDirectorio() {
 #       - Si el parametro opcional es correcto, que se haya ingresado un dia de la semana
 #           - Si se ingreso un dia de la semana, que sea valido
 validarParametrosOpcionales() {
-    if [ ! -z $1 ]
-    then
-        if [[ ! ($1 == "-d" || $1 == "--dia") ]]
-        then
+    if [ ! -z $1 ]; then
+        if [[ ! ($1 == "-d" || $1 == "--dia") ]]; then
             echo "$1 no es un parametro valido. Para consultar la ayuda utilice -h, -? o -help"
+            echo "$uso"
             exit 1;
-        else
-            if [[ -z $2 ]]
-            then
+        elif [[ -z $2 ]]; then
                 echo "$2 no es un parametro valido. Para consultar la ayuda utilice -h, -? o -help"
+                echo "$uso"
                 exit 1;  
-            fi  
         fi
     else
         return 1;
@@ -104,8 +109,7 @@ validarParametrosOpcionales() {
 
 # Determina si el archivo corresponde a una cena o no
 esCena() {
-    if [ $1 -ge 19 ]
-    then
+    if [ $1 -ge 19 ]; then
         return 1;
     fi
     return 0;
@@ -122,11 +126,9 @@ renombrarArchivos() {
         date="${date:0:4}-${date:4:2}-${date:6:2}" # Formatea la fecha
         hora="${hora:0:2}" # Formatea la hora
     
-        if [[ ${2^^} != ${nombre_dia^^} ]]
-        then
+        if [[ ${2^^} != ${nombre_dia^^} ]]; then
             esCena $hora
-            if [[ $? == 1 ]]
-            then
+            if [[ $? == 1 ]]; then
                 mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg" #cambia nombre de archivos
             else
                 mv $archivo $(dirname "$archivo")/"$date almuerzo del $nombre_dia.jpg"
@@ -134,47 +136,42 @@ renombrarArchivos() {
         fi
     done
 }
-################################## FIN FUNCIONES ##################################
+# ---------------------------------- FIN FUNCIONES ----------------------------------
 
-################################## VALIDACIONES ##################################
+# ---------------------------------- VALIDACIONES ----------------------------------
 # Si no se pasaron parametros al script se informa error
-if [[ $# == 0 ]] 
-then
+if [[ $# == 0 ]]; then
 	echo "El script requiere parametros para funcionar. Para consultar la ayuda utilice -h, -? o -help"
 	echo "$uso"
 	exit 1
 fi
 
 # Si hay un solo parametro se verifica si es la ayuda o no
-if [[ $# == 1 ]] 
-then
-	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]] 
-	then
+if [[ $# == 1 ]]; then
+	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
 		echo "$ayuda"
 		exit 1;
 	fi
 fi
 
-# Si hay mas de 4 parametros (cantidad pedida) se informa error
-if [[ $# > 4 ]] 
-then
+# Si hay mas de 4 parametros (cantidad maxima pedida) se informa error
+if [[ $# > 4 ]]; then
 	echo "Error en la cantidad de parametros. Para consultar la ayuda utilice -h, -? o -help"
 	echo "$uso"
 	exit 1;
 fi
 
-################################## FIN VALIDACIONES ##################################
+# ---------------------------------- FIN VALIDACIONES ----------------------------------
 
 
-################################## PROGRAMA ##################################
+# ---------------------------------- PROGRAMA ----------------------------------
 while test "$1"
 do  
     case "$1" in
         --path | -p) shift ;
         validarDirectorio $1 ;
         validarParametrosOpcionales $2 $3
-        if [[ $? == 1 ]]
-            then
+        if [[ $? == 1 ]]; then
             renombrarArchivos $1 ;
         else
             renombrarArchivos $1 $3 ;
@@ -182,7 +179,7 @@ do
         ;;
         * ) break ;;
     esac
-    shift;
+    #shift;
 done
-################################## FIN PROGRAMA ##################################
+# ---------------------------------- FIN PROGRAMA ----------------------------------
 

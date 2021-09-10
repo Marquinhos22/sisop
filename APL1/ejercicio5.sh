@@ -33,22 +33,35 @@ help() {
 	exit 1;
 }
 
-validarDirectorio() {
-	realpath -e "$1" > /dev/null 2>&1
-	if [[ $? == 1 ]]; then
-		help "La ruta provista en el archivo de configuracion no existe"
-	fi
 
-	path=`realpath -e "$1"`
+# Funcion que valida si el parametro pasado es un directorio (y su existencia como path)
+validarDirectorio() {
+	#realpath -e "$1" > /dev/null 2>&1
+	#if [[ $? == 1 ]]; then
+	#	help "La ruta provista en el archivo de configuracion no existe"
+	#fi
+
+	#path=`realpath -e "$1"`
 
 #	path=`dirname "$path"`
-	echo "Path a analizar: $path"
-	if [[ ! -d "$path" ]]
+	echo "Path a analizar: $1"
+	if [[ ! -d "$1" ]]
 	then
 		help "La ruta provista en el archivo de configuracion no es directorio valido"
 	fi
 }
 
+#
+obtenerPathAbsoluto() {
+	realpath -e "$1" > /dev/null 2>&1
+	if [[ $? == 1 ]]; then
+		help "La ruta provista en el archivo de configuracion no existe"
+	fi
+
+	echo `realpath -e "$1"`
+}
+
+# Funcion que verifica que el archivo de configuracion sea un archivo de texto (.txt)
 verificarArchivoDeConfiguracion() {
 	path=`realpath "$1"`
 	#path=`dirname "$path"`
@@ -81,42 +94,42 @@ if [[ $# == 1 ]] ; then
 	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
 		help
 	fi
-#Verifico que el unico parametro pasado sea un archivo de configuracion (archivo de texto)
+# Verifico que el unico parametro pasado sea un archivo de configuracion (archivo de texto)
 verificarArchivoDeConfiguracion "$1"
 fi
 # ---------------------------------- FIN VALIDACIONES ----------------------------------
 
 # ---------------------------------- PROGRAMA ----------------------------------
+# Obtengo el directorio de destino de los .zip y lo valido (si es una ruta valida y si es un directorio)
 directorioDestino=$(awk 'FNR==1 { print $0 }' "$1")
-echo "Validando directorio de destino"
-validarDirectorio $directorioDestino
-echo "Directorio de destino valido"
+directorioDestino=$(obtenerPathAbsoluto "$directorioDestino")
+validarDirectorio "$directorioDestino"
 
-listaDirectoriosBase=$(awk ' NR>1 { print $0 }' "$1")
-echo "$listaDirectoriosBase"
-for d in $listaDirectoriosBase; do
-	validarDirectorio "$d"
+# Obtengo los directorios en donde se encuentran los logs a tratar y los valido
+listaDirectoriosBase=(`awk 'NR>1 { print $0 }' "$1"`)
+
+for i in "${!listaDirectoriosBase[@]}"; do
+	listaDirectoriosBase[$i]=`obtenerPathAbsoluto "${listaDirectoriosBase[$i]}"`
+	validarDirectorio "${listaDirectoriosBase[$i]}"
 done
 
-listArchivo=$(awk 'BEGIN { FS = "/" } ; NR>1 {print $(NF-1)}' "$1")
-echo "$listArchivo"
+# Obtengo el nombre del directorio padre de cada una de las rutas de directorios de logs
+listArchivo=(`awk 'BEGIN { FS = "/" } ; NR>1 {print $(NF-1)}' "$1"`)
 
+# Creo un array conteniendo los nombres de los archivos .zip a crear
 ITEMSZIP=()
-
-for d in $listArchivo; do
+for i in "${!listArchivo[@]}"; do
 	fec=$(printf '%(%Y%m%d_%H%M%S)T')
-	#echo $fec
-	ITEM=logs_$d"_$fec".zip
-	echo $ITEM
-	ITEMSZIP+=$ITEM
+	ITEM=logs_"${listArchivo[i]}""_$fec.zip"
+	ITEMSZIP+=("$ITEM")
 done
 
-echo "BOCA $ITEMSZIP"
-exit 1;
-
-
-
-
+for i in "${!listaDirectoriosBase[@]}"; do
+	cd "${listaDirectoriosBase[i]}"
+	#find . -mtime +1 | zip "${ITEMSZIP[i]}" *txt
+	find . -mtime +1 -iname '*.txt' -o -iname '*.log' -o -iname '*.info' | zip "$directorioDestino/${ITEMSZIP[i]}" -@ 
+done
+exit 1
 DirectorioZip="${ITEMSDIR[0]}/${ITEMSZIP[1]}"
 echo "Archivos del cual debo comprimir " $(realpath ${ITEMSDIR[1]})" ;Archivo zip $DirectorioZip"
 zip "$DirectorioZip" "$(realpath ${ITEMSDIR[1]})"

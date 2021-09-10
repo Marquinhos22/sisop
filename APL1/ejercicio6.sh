@@ -63,7 +63,7 @@ help() {
 	exit 1;
 }
 
-# Aquí se verifica que los parametros correspondientes a los operandos de las operaciones sean numeros reales
+# Funcion que verifica que los parametros correspondientes a los operandos de las operaciones sean numeros reales
 validarNumeroReal() {	
 regInt="^[+-]?[0-9]+$" # Expresion REGEX que valida enteros
 regFloat="^[+-]?[0-9]*\.[0-9]+$" # Expresion REGEX que valida flotantes

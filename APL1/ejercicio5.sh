@@ -40,6 +40,8 @@ validarDirectorio() {
 	if [[ ! -d "$1" ]]
 	then
 		help "La ruta provista en el archivo de configuracion no es directorio valido"
+	elif [[ ! -r $1 || ! -w $1 ]]; then
+        help "No se tienen los permisos necesarios sobre el directorio"
 	fi
 }
 

@@ -50,6 +50,17 @@ uso="Uso del script: ./ejercicio2.sh <-p [-d]>"
 # ---------------------------------- FIN AYUDA ----------------------------------
 
 # ---------------------------------- FUNCIONES ----------------------------------
+# Funcion que muestra mensajes de errores y brinda la ayuda o el uso sobre el script
+help() {
+	if [[ ! -z $1 ]]; then
+		echo "$1. Para consultar la ayuda utilice -h, -? o -help"
+		echo "$uso"
+	else
+		echo "$ayuda"
+	fi
+	exit 1;
+}
+
 # Aqui se valida si el dia de la semana pasado como parametro opcional es valido o no
 validarDiaSemana() {
     semana=(lunes martes miercoles jueves viernes sabado domingo)
@@ -63,25 +74,29 @@ validarDiaSemana() {
     done
 
     if [[ $flag != 1 ]]; then
-            echo "$1 no es un dia de la semana. Para consultar la ayuda utilice -h, -? o -help"
+            help ""$1" no es un dia de la semana"
             exit 1;
     fi
+}
+
+# Funcion que obtiene el path absoluto del parametro pasado
+obtenerPathAbsoluto() {
+	realpath -e "$1" > /dev/null 2>&1
+	if [[ $? == 1 ]]; then
+		help "La ruta provista en el archivo de configuracion no existe"
+	fi
+
+	echo `realpath -e "$1"`
 }
 
 # Aqui se valida el directorio pasado por parametros
 validarDirectorio() {
     if [[ ! -d $1 ]]; then
-        echo "El parametro pasado no es un directorio. Para consultar la ayuda utilice -h, -? o -help"
-        echo "$uso"
-        exit 1;
+        help "El parametro pasado no es un directorio"
     elif [[ ! -e $1 ]]; then
-        echo "No existe la ruta al archivo. Para consultar la ayuda utilice -h, -? o -help"
-        echo "$uso"
-        exit 1;
-    elif [[ ! -r $1 || ! -w $2 ]]; then
-        echo "No se tienen los permisos necesarios sobre el directorio. Para consultar la ayuda utilice -h, -? o -help"
-        echo "$uso"
-        exit 1;
+        help "No existe la ruta al archivo"
+    elif [[ ! -r $1 || ! -w $1 ]]; then
+        help "No se tienen los permisos necesarios sobre el directorio"
     fi
 }
 
@@ -92,13 +107,9 @@ validarDirectorio() {
 validarParametrosOpcionales() {
     if [ ! -z $1 ]; then
         if [[ ! ($1 == "-d" || $1 == "--dia") ]]; then
-            echo "$1 no es un parametro valido. Para consultar la ayuda utilice -h, -? o -help"
-            echo "$uso"
-            exit 1;
+            help ""$1" no es un parametro valido"
         elif [[ -z $2 ]]; then
-                echo "$2 no es un parametro valido. Para consultar la ayuda utilice -h, -? o -help"
-                echo "$uso"
-                exit 1;  
+            help ""$2" no es un parametro valido"
         fi
     else
         return 1;
@@ -117,6 +128,7 @@ esCena() {
 
 # Aqui se renombran los archivos del directorio pasado por parametro y sus subdirectorios correspondientes
 renombrarArchivos() {
+    echo "--------- Renombrando archivos ---------"
     cd $1
     for archivo in $(find . -name "*[0-9].jpg") # Iterar buscando archivos terminados en .jpg
     do
@@ -129,12 +141,14 @@ renombrarArchivos() {
         if [[ ${2^^} != ${nombre_dia^^} ]]; then
             esCena $hora
             if [[ $? == 1 ]]; then
-                mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg" #cambia nombre de archivos
+                mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg" # Cambia nombre de archivos
             else
                 mv $archivo $(dirname "$archivo")/"$date almuerzo del $nombre_dia.jpg"
             fi
         fi
     done
+
+    echo "--------- Proceso finalizado ---------"
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
 
@@ -169,15 +183,16 @@ while test "$1"
 do  
     case "$1" in
         --path | -p) shift ;
-        validarDirectorio $1 ;
-        validarParametrosOpcionales $2 $3
+        dir=`obtenerPathAbsoluto "$1"`
+        validarDirectorio "$dir" ;
+        validarParametrosOpcionales "$2" "$3"
         if [[ $? == 1 ]]; then
-            renombrarArchivos $1 ;
+            renombrarArchivos "$1" ;
         else
-            renombrarArchivos $1 $3 ;
+            renombrarArchivos "$1" "$3" ;
         fi
         ;;
-        * ) break ;;
+        * ) help "Parametros incorrectos" ; break ;;
     esac
     #shift;
 done

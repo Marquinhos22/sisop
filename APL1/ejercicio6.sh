@@ -37,9 +37,10 @@ Uso: ./ejercicio6.sh < -n1 nnnn -n2 nnnn -suma | -resta | -multiplicacion | -div
 Ejemplo: ./ejercicio6.sh -n1 2 -n2 2 -suma
 
 #PARAMETROS#
-	[-n1 nnnn]: primer operando.
-	[-n2 nnnn]: segundo operando.
-	[-suma | -resta | -multiplicacion | -division]: tipo de operacion matematica a realizar
+	-n1 nnnn: primer operando.
+	-n2 nnnn: segundo operando.
+	-suma | -resta | -multiplicacion | -division: tipo de operacion matematica a realizar
+	-h | -? | -help: ayuda sobre el script
 
 #ACLARACIONES#
 - Todos los parametros del script son obligatorios.
@@ -51,6 +52,17 @@ uso="Uso del script: ./ejercicio6.sh < -n1 nnnn -n2 nnnn -suma | -resta | -multi
 # ---------------------------------- FIN AYUDA ----------------------------------
 
 # ---------------------------------- FUNCIONES ----------------------------------
+# Funcion que muestra mensajes de errores y brinda la ayuda o el uso sobre el script
+help() {
+	if [[ ! -z $1 ]]; then
+		echo "$1. Para consultar la ayuda utilice -h, -? o -help"
+		echo "$uso"
+	else
+		echo "$ayuda"
+	fi
+	exit 1;
+}
+
 # Aquí se verifica que los parametros correspondientes a los operandos de las operaciones sean numeros reales
 validarNumeroReal() {	
 regInt="^[+-]?[0-9]+$" # Expresion REGEX que valida enteros
@@ -58,9 +70,7 @@ regFloat="^[+-]?[0-9]*\.[0-9]+$" # Expresion REGEX que valida flotantes
 
 # Se verifica que el operando matchee ambos REGEX
 if [[ ! ($1 =~ $regInt || $1 =~ $regFloat) ]]; then
-	echo "Error en los parametros. Los numeros ingresados deben ser reales. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1;
+	help "Error en los parametros. Los numeros ingresados deben ser reales"
 fi
 }
 
@@ -68,9 +78,7 @@ fi
 # Al verificar que los operandos no esten vacios, nos aseguramos que sean los primeros parametros en pasarse.
 validarParametros() { 
 if [[ ( -z "$1" || -z "$2" ) ]]; then
-	echo "Error en los parametros. Por favor ingrese la operacion luego de los operandos. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1;
+	help "Error en los parametros. Por favor ingrese la operacion luego de los operandos"
 fi
 }
 
@@ -111,24 +119,19 @@ division() {
 # ---------------------------------- VALIDACIONES ----------------------------------
 # Si no se pasaron parametros al script se informa error
 if [[ $# == 0 ]]; then
-	echo "El script requiere parametros para funcionar. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1
+	help "El script requiere parametros para funcionar"
 fi
 
 # Si hay un solo parametro se verifica si es la ayuda o no
 if [[ $# == 1 ]] ; then
 	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
-		echo "$ayuda"
-		exit 1;
+		help
 	fi
 fi
 
 # Si hay mas de cinco parametros (cantidad pedida) se informa error
 if [[ $# > 5 ]]; then
-	echo "Error en la cantidad de parametros. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1;
+	help "Error en la cantidad de parametros"
 fi
 # ---------------------------------- FIN VALIDACIONES ----------------------------------
 

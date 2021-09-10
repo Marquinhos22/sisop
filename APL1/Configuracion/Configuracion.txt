@@ -1,0 +1,4 @@
+./tmp/viejos_logs
+./tmp/servicios/busqueda/logs
+./tmp/servicios/cargas/registros
+./tmp/servicios/ubicaciones/temporales

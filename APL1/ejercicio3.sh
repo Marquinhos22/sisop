@@ -158,13 +158,16 @@ renombrarArchivos() {
 function stop(){
 
 echo "Se esta sellando al demonio: "
-#var=`ps -ef | grep {$name} | tr -s ' ' | cut -d ' ' -f2`
+var=`ps -ef | grep {$name} | tr -s ' ' | cut -d ' ' -f2`
 #var=$(ps -e | grep ${name} | awk '{print $1}' )
-var=$(ps -e | grep "ejercicio3.sh" | grep -v "bash" | awk '{print $2}' )
 #var=`pgrep "$name"`
 #busco el nombre de la ejecucion y guardo el pid.
-echo "$var"
-kill -9 "$var"
+#echo "$var"
+#var=$(ps -e | grep "ejercicio3.sh" | grep -v "bash" | awk '{print $2}' )
+pidmy=$$
+echo "VAR $var"
+echo "PIDMY $pidmy"
+kill -9 "$pidmy"
 exit 0;
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
@@ -216,7 +219,7 @@ do
         dir="`obtenerPathAbsoluto "$1"`"
         validarParametrosOpcionales "$2" "$3"
         if [[ $? == 1 ]]; then
-            renombrarArchivos "$dir" >/dev/null 2>&1 < /dev/null &
+            renombrarArchivos "$dir" >/dev/null &
         else
             renombrarArchivos "$dir" "$3" >/dev/null 2>&1 < /dev/null &
         fi

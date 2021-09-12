@@ -26,7 +26,7 @@
 	###################################
 
 # ---------------------------------- AYUDA ----------------------------------
-name="demonio"
+name="ejercicio3.sh"
 #nombre de este arch, para buscar luego la rutina que se este ejecutando.
 
 ayuda="
@@ -149,8 +149,7 @@ renombrarArchivos() {
                 fi
             fi
         done
-        sleep 3
-    done &
+    done
 
     echo "--------- Proceso finalizado ---------"
     exit 0;
@@ -159,9 +158,14 @@ renombrarArchivos() {
 function stop(){
 
 echo "Se esta sellando al demonio: "
-var=$(ps -e |grep ${name} |awk '{print $1}' )
+#var=`ps -ef | grep {$name} | tr -s ' ' | cut -d ' ' -f2`
+#var=$(ps -e | grep ${name} | awk '{print $1}' )
+var=$(ps -e | grep "ejercicio3.sh" | grep -v "bash" | awk '{print $2}' )
+#var=`pgrep "$name"`
 #busco el nombre de la ejecucion y guardo el pid.
-kill -9 ${var}
+echo "$var"
+kill -9 "$var"
+exit 0;
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
 
@@ -212,19 +216,19 @@ do
         dir="`obtenerPathAbsoluto "$1"`"
         validarParametrosOpcionales "$2" "$3"
         if [[ $? == 1 ]]; then
-            renombrarArchivos "$dir" #>/dev/null 2>&1 < /dev/null &
+            renombrarArchivos "$dir" >/dev/null 2>&1 < /dev/null &
         else
             renombrarArchivos "$dir" "$3" >/dev/null 2>&1 < /dev/null &
         fi
+        exit 0
         ;;
         -k) if [[ $# == 1 ]]; then
                 stop
             else
                 help "Para detener el demonio solo debe ingresar el parametro -k"
             fi ;;
-        #* ) help "Parametros incorrectos" ; break ;;
+        * ) help "Parametros incorrectos" ; break ;;
     esac
-    #shift;
 done
 # ---------------------------------- FIN PROGRAMA ----------------------------------
 

@@ -4,7 +4,7 @@
 	#                                 #
 	#        Trabajo Práctico 1       #
 	#          Ejercicio Nº 2         #
-	#           ejercicio2.sh         #
+	#           ejercicio3.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
@@ -26,21 +26,22 @@
 	###################################
 
 # ---------------------------------- AYUDA ----------------------------------
+name="demonio"
+#nombre de este arch, para buscar luego la rutina que se este ejecutando.
+
 ayuda="
-Ayuda correspondiente al script ejercicio2.sh
+Ayuda correspondiente al script ejercicio3.sh
 
 #OBJETIVO PRINCIPAL#
-Este script permite renombrar los archivos (en formato .jpg que sigan una determinada estructura en su nombre) presentes en el directorio pasado por parametro.
-El script admite un parametro obligatorio que es la ruta del directorio y un parametro opcional que es el nombre de un dia para el cual no se quieren renombrar los archivos.
 
 #USO#
-Uso: ./ejercicio2.sh <-p directorio [-d diaDeLaSemana]>
+Uso: ./ejercicio3.sh <-p directorio> [-d diaDeLaSemana] [-k] --> modificar
 Ejemplo: ./ejercicio2.sh -p APL1/ -d martes
 
 #PARAMETROS#
     -p, --path: directorio donde se encuentran los archivos.
     [-d, --dia]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
-
+    [-k]: detiene el demonio si es que se esta ejecutando
 #ACLARACIONES#
 
 
@@ -130,26 +131,37 @@ esCena() {
 renombrarArchivos() {
     echo "--------- Renombrando archivos ---------"
     cd "$1"
-    for archivo in $(find . -name "*[0-9].jpg") # Iterar buscando archivos terminados en .jpg
-    do
-        date=$(echo "$archivo" | grep -oE '[0-9]{8}') # Extraer los primeros 8 nros del nombre del archivo
-        hora=$(echo "$archivo" | grep -oE '[0-9]{6}.jpg') # Extraer los 6 nros finales del nombre del archivo
-        nombre_dia=$(date -d $date +%A)  # Determina el dia de la semana
-        date="${date:0:4}-${date:4:2}-${date:6:2}" # Formatea la fecha
-        hora="${hora:0:2}" # Formatea la hora
-    
-        if [[ ${2^^} != ${nombre_dia^^} ]]; then
-            esCena $hora
-            if [[ $? == 1 ]]; then
-                mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg" # Cambia nombre de archivos
-            else
-                mv $archivo $(dirname "$archivo")/"$date almuerzo del $nombre_dia.jpg"
+    while true; do
+        for archivo in $(find . -name "*[0-9].jpg") # Iterar buscando archivos terminados en .jpg
+        do
+            date=$(echo "$archivo" | grep -oE '[0-9]{8}') # Extraer los primeros 8 nros del nombre del archivo
+            hora=$(echo "$archivo" | grep -oE '[0-9]{6}.jpg') # Extraer los 6 nros finales del nombre del archivo
+            nombre_dia=$(date -d $date +%A)  # Determina el dia de la semana
+            date="${date:0:4}-${date:4:2}-${date:6:2}" # Formatea la fecha
+            hora="${hora:0:2}" # Formatea la hora
+        
+            if [[ ${2^^} != ${nombre_dia^^} ]]; then
+                esCena $hora
+                if [[ $? == 1 ]]; then
+                    mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg" # Cambia nombre de archivos
+                else
+                    mv $archivo $(dirname "$archivo")/"$date almuerzo del $nombre_dia.jpg"
+                fi
             fi
-        fi
-    done
+        done
+        sleep 3
+    done &
 
     echo "--------- Proceso finalizado ---------"
     exit 0;
+}
+
+function stop(){
+
+echo "Se esta sellando al demonio: "
+var=$(ps -e |grep ${name} |awk '{print $1}' )
+#busco el nombre de la ejecucion y guardo el pid.
+kill -9 ${var}
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
 
@@ -183,16 +195,33 @@ fi
 while test "$1"
 do  
     case "$1" in
-        --path | -p) shift ;
+        --path | -p) 
+        #ejecuto para saber si la rutina ya esta en ejecucion
+        # $0 toma el nombre del scrip que lo llama
+        if pidof -x $(basename $0) >/dev/null;then
+            for p in $(pidof -x $(basename $0));do
+                if [ $p -ne $$ ]
+                    then
+                        echo "El demonio ya ha sido liberado, para invocarlo nuevamente primero debe sellarlo con -k "
+                        exit
+                fi
+            done
+        fi
+        shift ;
         validarDirectorio "$1" ;
         dir="`obtenerPathAbsoluto "$1"`"
         validarParametrosOpcionales "$2" "$3"
         if [[ $? == 1 ]]; then
-            renombrarArchivos "$dir" ;
+            renombrarArchivos "$dir" #>/dev/null 2>&1 < /dev/null &
         else
-            renombrarArchivos "$dir" "$3" ;
+            renombrarArchivos "$dir" "$3" >/dev/null 2>&1 < /dev/null &
         fi
         ;;
+        -k) if [[ $# == 1 ]]; then
+                stop
+            else
+                help "Para detener el demonio solo debe ingresar el parametro -k"
+            fi ;;
         #* ) help "Parametros incorrectos" ; break ;;
     esac
     #shift;

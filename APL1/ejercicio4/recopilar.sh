@@ -147,7 +147,7 @@ borrarTemporales() {
 #Muestra las sucursales donde los archivos fallaron y estan vacios
 mostrarSucursalesVacias() {
 
-	if [ ${sucursalesVacias[*]} != 0 ]
+	if [ ${sucursalesVacias[*]} ]
 	then
 		echo -e "\nLas siguientes sucursales tuvieron error en sus archivos:"
 		echo -e "${sucursalesVacias[*]}"

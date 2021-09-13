@@ -118,7 +118,7 @@ recorrerCSV() {
 			if [ "$noCuenta" != "${nombreArch,,}" ]
 			then 
 				#consolido los archivo producto(en minusculas) + Importe Recaudado a un archivo temporal
-				#awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' $archCsv >> tempConsolidado
+				awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' $archCsv >> tempConsolidado
 				process=True
 			fi
 
@@ -160,12 +160,12 @@ mostrarSucursalesVacias() {
 procesarSucursales() {
 
 	#Agrupo sumando el importe de los mismos productos y ordeno por columna producto a otro archivo temporal
-  	#awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
+  	awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
 
 	#Cuento la cantidad total de productos
   	cantReg=$(wc -l < tempAgrupado)
 	#Genero el archivo salida.json en el directorio enviado por parametro -o
-  	#awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalidaAbs/salida.json"
+  	awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalidaAbs/salida.json"
 	
 }
 

@@ -1,5 +1,30 @@
 #!/bin/bash
 
+	###################################
+	#                                 #
+	#        Trabajo Práctico 1       #
+	#          Ejercicio Nº 4         #
+	#           recopilar.sh          #
+	#                                 #
+	# Cammarano, Santiago             #
+	# DNI: 41.582.407                 #
+	#                                 #
+	# Ramos, Marcos Gerardo   	  #
+	# DNI: 11.111.111                 #
+	#                                 #
+	# Martel, Lucas             	  #
+	# DNI: 39.348.436                 #
+	#                                 #
+	# Rius Conde, Lucio      	  #
+	# DNI: 41.779.534   		  #
+	#  				  #
+	# Sullca, Fernando Willian        #
+	# DNI: 37.841.788	          #
+	#                                 #
+	# 	      1º Entrega     	  #
+	#                                 #
+	###################################
+
 function help {
 
     echo ".....................................Descripcion:............................................"
@@ -29,8 +54,8 @@ ARGS=`getopt -q -o d:o:e: -n 'parse-options' -- "$@"`
 if [ $? != 0 ]
 then
 	echo -e "\nParametros inválidos.\n"
-	help;
-	exit 1;
+	echo -e "$0 -? | -h | --help para ayuda"
+	exit 0
 fi
 
 eval set -- "$ARGS"
@@ -70,7 +95,7 @@ while true ; do
 			echo -e "$0 -? | -h | --help para ayuda"
 			exit 0
 		fi ; shift ; shift ;;
-
+	#Al tomar el valor de sucursal a ignorar lo paso a minusculas por ser no case sensitive
   	-e ) noCuenta="${2,,}" ; shift ; shift ;;
 	
   	-- ) shift; break ;;
@@ -78,42 +103,98 @@ while true ; do
 	esac
 done
 
-#bandera para saber si al menos se procesa un archivo
-process=False
+#
+recorrerCSV() {
 
-#Recorro los archivo .csv del directorio enviado con parametro -d
-for archCsv in "$(find $dirCsv -type f -name '*.csv')"
-do
-	#Tomo sólo el nombre del archivo sin extension
-	nombreArch=$(basename -s .csv $archCsv)
-    
-	#echo "no cuenta: $noCuenta"
-	#echo "nombre archivo: $nombreArch"
-    
-	#Si nombre del archivo es distinto al de la excepcion, proceso
-	if [ "$noCuenta" != "${nombreArch,,}" ]
-    then 
-		# consolido los archivo producto(en minusculas),Importe Recaudado a un archivo temporal
-		awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' $archCsv >> tempConsolidado
-		process=True
-    else
-		echo "Por aqui!! no pasa"
+	for archCsv in $sucursales
+	do
+		#Tomo sólo el nombre del archivo sin extension ni ruta
+		nombreArch=$(basename -s .csv $archCsv)
+			
+		#valido que el archivo no este vacio
+		if [ -s "$archCsv" ]
+		then
+			#Si nombre del archivo es distinto al de la excepcion, lo proceso
+			if [ "$noCuenta" != "${nombreArch,,}" ]
+			then 
+				#consolido los archivo producto(en minusculas) + Importe Recaudado a un archivo temporal
+				#awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' $archCsv >> tempConsolidado
+				process=True
+			fi
+
+		else
+			#Si esta vacio lo acumulo en una varible
+			sucursalesVacias+=($nombreArch)
+		fi
+
+	done
+
+}
+
+# Funcion que obtiene el path absoluto del parametro pasado
+obtenerPathAbsoluto() {
+	echo `realpath -e "$1"`
+}
+
+#Borro archivos temporales
+borrarTemporales() {
+
+	rm tempConsolidado
+	rm tempAgrupado
+
+}
+
+#Muestra las sucursales donde los archivos fallaron y estan vacios
+mostrarSucursalesVacias() {
+
+	if [ ${sucursalesVacias[*]} != 0 ]
+	then
+		echo -e "\nLas siguientes sucursales tuvieron error en sus archivos:"
+		echo -e "${sucursalesVacias[*]}"
+	else
+		echo -e "\nNo hubo errores en las sucursales procesadas."		
 	fi
 
-done
+}
+#Borro archivos temporales
+procesarSucursales() {
 
-#Proceso si tuve al menos un archivo valido
-if [ $process == True ]
-then
 	#Agrupo sumando el importe de los mismos productos y ordeno por columna producto a otro archivo temporal
-  	awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
-  	#Elimino el archivo temporal de consolidado
-	rm tempConsolidado
+  	#awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
 
 	#Cuento la cantidad total de productos
   	cantReg=$(wc -l < tempAgrupado)
 	#Genero el archivo salida.json en el directorio enviado por parametro -o
-  	awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalida/salida.json"
-  	#Elimino el archivo temporal de agrupamiento
-	rm tempAgrupado
+  	#awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalidaAbs/salida.json"
+	
+}
+
+sucursalesVacias=()
+
+dirCsvAbs="`obtenerPathAbsoluto "$dirCsv"`"
+dirSalidaAbs="`obtenerPathAbsoluto "$dirSalida"`"
+
+#valido que el path de salida no sea el mismo que el de archivos csv
+if [ "$dirCsvAbs" == "$dirSalidaAbs" ]
+then
+	echo -e "\nEl directorio de salida no puede ser el mismo que el directorio a analizar."
+	echo -e "\n$0 -? | -h | --help para ayuda"
+	exit 0
+
+fi
+
+sucursales=$(find $dirCsvAbs -type f -name '*.csv')
+
+#bandera para saber si al menos se procesa un archivo
+process=False
+
+#Recorro los archivo .csv del directorio enviado con parametro -d
+recorrerCSV
+
+#Proceso si tuve al menos un archivo valido
+if [ $process == True ]
+then
+	procesarSucursales
+	borrarTemporales
+	mostrarSucursalesVacias
 fi

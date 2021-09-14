@@ -9,11 +9,11 @@
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
 	#                                 #
-	# Ramos, Marcos Gerardo   	      #
-	# DNI: 35.896.637                 #
-	#                                 #
-	# Martel, Lucas             	  #
+	# Martel, Lucas                   #
 	# DNI: 39.348.436                 #
+	#                                 #
+	# Ramos, Marcos Gerardo           #
+	# DNI: 35.896.637                 #
 	#                                 #
 	# Rius Conde, Lucio        	  	  #
 	# DNI: 41.779.534 		  		  #

@@ -38,12 +38,12 @@ Uso: ./ejercicio2.sh <-p directorio> [-d diaDeLaSemana]
 Ejemplo: ./ejercicio2.sh -p APL1/ -d martes
 
 #PARAMETROS#
-    -p, --path: directorio donde se encuentran los archivos.
-    [-d, --dia]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+    -p, --path directorio: directorio donde se encuentran los archivos.
+    [-d, --dia diaDeLaSemana]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+	-h | -? | -help: ayuda sobre el script
 
 #ACLARACIONES#
-
-
+- El dia de la semana a excluir se puede ingresar en español o en ingles
 "
 
 uso="Uso del script: ./ejercicio2.sh <-p> [-d]"
@@ -86,11 +86,11 @@ obtenerPathAbsoluto() {
 
 # Funcion que valida el directorio pasado por parametros
 validarDirectorio() {
-    if [[ ! -d $1 ]]; then
+    if [[ ! -d "$1" ]]; then
         help "El parametro pasado no es un directorio"
-    elif [[ ! -e $1 ]]; then
+    elif [[ ! -e "$1" ]]; then
         help "No existe la ruta al archivo"
-    elif [[ ! -r $1 || ! -w $1 ]]; then
+    elif [[ ! -r "$1" || ! -w "$1" ]]; then
         help "No se tienen los permisos necesarios sobre el directorio"
     fi
 }
@@ -168,28 +168,21 @@ renombrarArchivos() {
 # ---------------------------------- VALIDACIONES ----------------------------------
 # Si no se pasaron parametros al script se informa error
 if [[ $# == 0 ]]; then
-	echo "El script requiere parametros para funcionar. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1
+	help "El script requiere parametros para funcionar"
 fi
 
 # Si hay un solo parametro se verifica si es la ayuda o no
 if [[ $# == 1 ]]; then
 	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
-		echo "$ayuda"
-		exit 1;
+		help
 	fi
 fi
 
 # Si hay mas de 4 parametros (cantidad maxima pedida) se informa error
 if [[ $# > 4 ]]; then
-	echo "Error en la cantidad de parametros. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1;
+	help "Error en la cantidad de parametros"
 fi
-
 # ---------------------------------- FIN VALIDACIONES ----------------------------------
-
 
 # ---------------------------------- PROGRAMA ----------------------------------
 while test "$1"

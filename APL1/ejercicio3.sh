@@ -41,13 +41,14 @@ Ejemplo para ejecutar el demonio: ./ejercicio3.sh -p APL1/ -d martes
 Ejemplo para detener el demonio: ./ejercicio3.sh -k
 
 #PARAMETROS#
-    -p, --path: directorio donde se encuentran los archivos.
-    [-d, --dia]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+    -p, --path directorio: directorio donde se encuentran los archivos.
+    [-d, --dia diaDeLaSemana]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
     [-k]: detiene el demonio si es que se esta ejecutando
+	-h | -? | -help: ayuda sobre el script
+
 
 #ACLARACIONES#
-
-
+- El dia de la semana a excluir se puede ingresar en español o en ingles
 "
 
 uso="Uso del script: ./ejercicio3.sh <-p directorio> [-d diaDeLaSemana] [-k]"
@@ -90,11 +91,11 @@ obtenerPathAbsoluto() {
 
 # Funcion que valida el directorio pasado por parametros
 validarDirectorio() {
-    if [[ ! -d $1 ]]; then
+    if [[ ! -d "$1" ]]; then
         help "El parametro pasado no es un directorio"
-    elif [[ ! -e $1 ]]; then
+    elif [[ ! -e "$1" ]]; then
         help "No existe la ruta al archivo"
-    elif [[ ! -r $1 || ! -w $1 ]]; then
+    elif [[ ! -r "$1" || ! -w "$1" ]]; then
         help "No se tienen los permisos necesarios sobre el directorio"
     fi
 }
@@ -171,15 +172,13 @@ renombrarArchivos() {
 
 # Funcion que detiene el demonio corriendo en segundo plano
 stop() {
-    echo "Se esta sellando al demonio"
-
     # Obtengo el PID del proceso
     var=($(ps -ef | grep ${name} | awk ' {print $2}'))
 
     # Termino el proceso
     kill -9 "${var}"
 
-    echo "Demonio sellado"
+    echo "Script detenido correctamente"
     exit 0;
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
@@ -190,34 +189,30 @@ name="$0"
 
 # Si no se pasaron parametros al script se informa error
 if [[ $# == 0 ]]; then
-	echo "El script requiere parametros para funcionar. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1
+	help "El script requiere parametros para funcionar"
 fi
 
 # Si hay un solo parametro se verifica si es la ayuda o no
 if [[ $# == 1 ]]; then
 	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
-		echo "$ayuda"
-		exit 1;
+		help
 	fi
 fi
 
 # Si hay mas de 4 parametros (cantidad maxima pedida) se informa error
 if [[ $# > 4 ]]; then
-	echo "Error en la cantidad de parametros. Para consultar la ayuda utilice -h, -? o -help"
-	echo "$uso"
-	exit 1;
+	help "Error en la cantidad de parametros"
 fi
 
 # ---------------------------------- FIN VALIDACIONES ----------------------------------
-
 
 # ---------------------------------- PROGRAMA ----------------------------------
 while test "$1"
 do  
     case "$1" in
         --path | -p) shift ;
+
+        # Verifico que el script solo pueda ser llamado una vez
         if [[ `ps -ef | grep ${name} | awk ' {print $2}' | wc -l` >3 ]]; then
             help "Solo puede ejecutar el proceso una vez"
         fi
@@ -226,15 +221,19 @@ do
         dir="`obtenerPathAbsoluto "$1"`"
         validarParametrosOpcionales "$2" "$3"
         if [[ $? == 1 ]]; then
+
+            # Mandamos toda salida de ejecucion a >/dev/null
+            # Ejecutamos en segund plano con "&" 
             renombrarArchivos "$dir" >/dev/null &
-            echo "Demonio corriendo en segundo plano"
+            echo "Script corriendo en segundo plano"
         else
             renombrarArchivos "$dir" "$3" >/dev/null &
         fi
         exit 0;
         ;;
         -k) if [[ $# == 1 ]]; then
-                var=`ps -ef | grep ${name} | awk ' {print $2}' | wc -l`
+        
+                # Verifico que el script se este ejecutando para poder detenerlo
                 if [[ `ps -ef | grep ${name} | awk ' {print $2}' | wc -l` < 4 ]]; then
                     help "Para detener el demonio primero debe ejecutarlo"
                 else

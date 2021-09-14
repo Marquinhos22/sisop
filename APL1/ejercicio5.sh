@@ -40,6 +40,7 @@ Ejemplo: ./ejercicio5.sh ./Configuracion/configuracion.txt
 
 #PARAMETROS#
 	archivoDeConfiguracion.txt: archivo .txt con los directorios correspondientes
+	-h | -? | -help: ayuda sobre el script
 
 #ACLARACIONES#
 - El archivo de configuracion debe tener la siguiente estructura:
@@ -66,7 +67,7 @@ help() {
 validarDirectorio() {
 	if [[ ! -d "$1" ]]; then
 		help "La ruta provista en el archivo de configuracion no es directorio valido"
-	elif [[ ! -e $1 ]]; then
+	elif [[ ! -e "$1" ]]; then
         help "No existe la ruta al archivo"
 	elif [[ ! -r "$1" || ! -w "$1" ]]; then
         help "No se tienen los permisos necesarios sobre el directorio"
@@ -107,6 +108,7 @@ if [[ $# == 1 ]] ; then
 	if [[ $1 == "-h" || $1 == "-?" || $1 == "-help" ]]; then
 		help
 	fi
+	
 # Verifico que el unico parametro pasado sea un archivo de configuracion (archivo de texto)
 verificarArchivoDeConfiguracion "$1"
 fi

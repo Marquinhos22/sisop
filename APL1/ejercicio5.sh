@@ -3,14 +3,14 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
+	#          Ejercicio Nº 5         #
 	#           ejercicio5.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
 	#                                 #
 	# Ramos, Marcos Gerardo   	      #
-	# DNI: 11.111.111                 #
+	# DNI: 35.896.637                 #
 	#                                 #
 	# Martel, Lucas             	  #
 	# DNI: 39.348.436                 #

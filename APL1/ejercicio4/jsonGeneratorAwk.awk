@@ -3,18 +3,27 @@ BEGIN {
 }
 
 {   
-    if(NR==1){
+    
+    if(cantReg>1){
 
-        printf("{%s: %s, ",$1,$2)
+        if(NR==1){
 
+            printf("{%s: %s, ",$1,$2)
+
+        } else {
+
+            if(NR!=cantReg){
+                printf("%s: %s, ",$1,$2)
+            } else {
+                printf("%s: %s }",$1,$2)
+            }
+
+        }
     } else {
 
-        if(NR!=cantReg){
-            printf("%s: %s, ",$1,$2)
-        } else {
-            printf("%s: %s }",$1,$2)
-        }
+        printf("{%s: %s }",$1,$2)
 
     }
+
    
 }

@@ -65,6 +65,7 @@ help() {
 
 # Funcion que valida si el parametro pasado es un directorio (y su existencia como path)
 validarDirectorio() {
+	echo "$1"
 	if [[ ! -d "$1" ]]; then
 		help "La ruta provista en el archivo de configuracion no es directorio valido"
 	elif [[ ! -e "$1" ]]; then
@@ -118,6 +119,7 @@ fi
 # Obtengo el directorio de destino de los .zip y lo valido (si es una ruta valida y si es un directorio)
 directorioDestino=$(awk 'FNR==1 { print $0 }' "$1")
 validarDirectorio "$directorioDestino"
+echo "DIRECTORIO DESTINO: $directorioDestino"
 directorioDestino=$(obtenerPathAbsoluto "$directorioDestino")
 
 # Obtengo el nombre del directorio padre de cada una de las rutas de directorios de logs

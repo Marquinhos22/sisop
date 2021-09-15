@@ -135,33 +135,35 @@ renombrarArchivos() {
 
     while true; do
         # Para cada archivo (con el formato correspondiente) dentro del directorio
-        for archivo in $(find ./ -regextype posix-extended -regex '.*([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])\_(2[0-3]|[01][0-9])([0-5][0-9])([0-5][0-9]).(jpg)$') # Iterar buscando archivos terminados en .jpg
+        fotos=($(find ./ -regextype posix-extended -regex '.*([0-9]{4})(0[1-9]|1[0-2])(0[1-9]|[1-2][0-9]|3[0-1])\_(2[0-3]|[01][0-9])([0-5][0-9])([0-5][0-9]).(jpg)$'))
+        for i in ${!fotos[@]} # Iterar buscando archivos terminados en .jpg
         do
             # Extraer los primeros 8 nros del nombre del archivo
-            date=$(echo "$archivo" | grep -oE '[0-9]{8}') 
+            date=$(echo "${fotos[i]}" | grep -oE '[0-9]{8}') 
 
             # Extraer los 6 nros finales del nombre del archivo
-            hora=$(echo "$archivo" | grep -oE '[0-9]{6}.jpg') 
+            hora=$(echo "${fotos[i]}" | grep -oE '[0-9]{6}.jpg') 
 
             # Determina el dia de la semana y lo convierto a minuscula
             nombre_dia=$(date -d $date +%A)
             nombre_dia=${nombre_dia,}
+            echo "$nombre_dia"
 
             # Formatea la fecha
             date="${date:0:4}-${date:4:2}-${date:6:2}" 
 
             # Formatea la hora
             hora="${hora:0:2}" 
-
+        
             # Verifico si se quiere excluir un dia en base al parametro pasado
             if [[ ${2^^} != ${nombre_dia^^} ]]; then
                 # Averiguo si la foto corresponde a una cena o a un almuerzo en base a la hora
                 esCena $hora
 
                 if [[ $? == 1 ]]; then
-                    mv $archivo $(dirname "$archivo")/"$date cena del $nombre_dia.jpg"
+                    mv ${fotos[i]} $(dirname "${fotos[i]}")/"$date cena del $nombre_dia.jpg"
                 else
-                    mv $archivo $(dirname "$archivo")/"$date almuerzo del $nombre_dia.jpg"
+                    mv ${fotos[i]} $(dirname "$fotos[i]")/"$date almuerzo del $nombre_dia.jpg"
                 fi
             fi
         done

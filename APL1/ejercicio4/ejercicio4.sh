@@ -15,35 +15,30 @@
 	# Ramos, Marcos Gerardo           #
 	# DNI: 35.896.637                 #
 	#                                 #
-	# Rius Conde, Lucio        	  	  #
-	# DNI: 41.779.534 		  		  #
-	# 				  				  #
+	# Rius Conde, Lucio        	  #
+	# DNI: 41.779.534 		  #
+	# 				  #
 	# Sullca, Fernando Willian        #
-	# DNI: 37.841.788		  	      #
+	# DNI: 37.841.788		  #
 	#                                 #
-	# 	      1º Entrega     	  	  #
+	# 	      1º Entrega     	  #
 	#                                 #
 	###################################
 
 # ---------------------------------- AYUDA ----------------------------------
 ayuda="
 Ayuda correspondiente al script ejercicio2.sh
-
 #OBJETIVO PRINCIPAL#
 Este script consolida y procesa los archivos .csv de ventas de sucursales en un unico archivo .json
-
 #USO#
 Uso: ./ejercicio4.sh <-d directorioEntrada> [-e sucursal] <-o directorioSalida>
 Ejemplo de ejecucion: ./ejercicio4.sh -d lotePrueba -o salida -e moron
 Ejemplo de ejecucion: ./ejercicio4.sh -d “PathsCSV” -e “Moron” -o “dirSalida
 Ejemplo de ejecucion: ./ejercicio4.sh -d “PathsCSV” -o /home/usuario/dirSalida 
-
-
 #PARAMETROS#
     -d directorio: directorio donde se encuentran los archivos CSV de las sucursales. Subdirectorios incluidos.
     -e sucursal: parámetro opcional que indicará la exclusión de alguna sucursal a la hora de generar el archivo unificado. Solamente se puede excluir una sucursal.
     -o directorio: directorio donde se generará el resumen (salida.json).
-
 #ACLARACIONES#
 "
 
@@ -78,6 +73,72 @@ validarDirectorio() {
 		fi
     fi
 }
+
+#Recorre los archivos .CSV
+recorrerCSV() {
+
+	for archCsv in $sucursales
+	do
+		#Tomo sólo el nombre del archivo sin extension ni ruta
+		nombreArch=$(basename -s .csv $archCsv)
+			
+		#valido que el archivo no este vacio
+		if [ -s "$archCsv" ]
+		then
+			#Si nombre del archivo es distinto al de la excepcion, lo proceso
+			if [ "$noCuenta" != "${nombreArch,,}" ]
+			then 
+				#consolido los archivo producto(en minusculas) + Importe Recaudado a un archivo temporal
+				awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' $archCsv >> tempConsolidado
+				process=True
+			fi
+
+		else
+			#Si esta vacio lo acumulo en una varible
+			sucursalesVacias+=($nombreArch)
+		fi
+
+	done
+
+}
+
+# Funcion que obtiene el path absoluto del parametro pasado
+obtenerPathAbsoluto() {
+	echo `realpath -e "$1"`
+}
+
+#Borro archivos temporales
+borrarTemporales() {
+
+	rm tempConsolidado
+	rm tempAgrupado
+}
+
+#Muestra las sucursales donde los archivos fallaron y estan vacios
+mostrarSucursalesVacias() {
+
+	if [ ${sucursalesVacias[*]} ]
+	then
+		echo -e "\nLas siguientes sucursales tuvieron error en sus archivos:"
+		echo -e "${sucursalesVacias[*]}"
+	else
+		echo -e "\nNo hubo errores en las sucursales procesadas."		
+	fi
+
+}
+#Proceso las sucursales y creo salida.json
+procesarSucursales() {
+
+	#Agrupo sumando el importe de los mismos productos y ordeno por columna producto a otro archivo temporal
+  	awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
+
+	#Cuento la cantidad total de productos
+  	cantReg=$(wc -l < tempAgrupado)
+	#Genero el archivo salida.json en el directorio enviado por parametro -o
+  	awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalidaAbs/salida.json"
+	
+}
+
 # ---------------------------------- FIN FUNCIONES ----------------------------------
 
 # ---------------------------------- VALIDACIONES ----------------------------------
@@ -127,50 +188,35 @@ while true ; do
 	esac
 done
 
-# Verifico que el directorio de entrada sea distinto al de salida
-if [[ "$dirCsv" == "$dirSalida" ]]; then
+
+dirCsvAbs="`obtenerPathAbsoluto "$dirCsv"`"
+dirSalidaAbs="`obtenerPathAbsoluto "$dirSalida"`"
+
+#valido que el path de salida no sea el mismo que el de archivos csv
+if [ "$dirCsvAbs" == "$dirSalidaAbs" ]
+then
 	help "El directorio de entrada debe ser distinto al de salida"
 fi
 
-# Bandera para saber si al menos se procesa un archivo
+# ------------------------------- FIN VALIDACIONES ----------------------------------
+
+
+
+sucursalesVacias=()
+
+#tomo los archivos .csv del directorio enviado
+sucursales=$(find $dirCsvAbs -type f -name '*.csv')
+
+#bandera para saber si al menos se procesa un archivo
 process=False
 
-# Recorro los archivo .csv del directorio enviado con parametro -d
-archivosCsv=(`find $dirCsv -type f -name '*.csv'`)
+#Recorro los archivo .csv del directorio enviado con parametro -d
+recorrerCSV
 
-# Para cada archivo, obtengo su nombre y campos
-for i in "${!archivosCsv[@]}"
-do
-	# Tomo sólo el nombre del archivo sin extension
-	nombreArch=$(basename -s .csv ${archivosCsv[i]})
-
-	# Si nombre del archivo es distinto al de la excepcion, proceso
-	if [ "${noCuenta}" != "${nombreArch,,}" ]
-    then 
-
-		# Consolido los archivo producto(en minusculas)e importe Recaudado a un archivo temporal
-		awk 'BEGIN{FS=","}FNR > 1{ print tolower($1)","$2}' ${archivosCsv[i]} >> tempConsolidado
-		process=True
-	fi
-
-done
-
-# Proceso si tuve al menos un archivo valido
-if [ "$process" == True ]
+#Proceso si tuve al menos un archivo valido
+if [ $process == True ]
 then
-
-	#Agrupo sumando el importe de los mismos productos y ordeno por columna producto a otro archivo temporal
-  	awk -f agruparProductos.awk tempConsolidado | sort -k1 >> tempAgrupado
-
-  	#Elimino el archivo temporal de consolidado
-	rm tempConsolidado
-
-	#Cuento la cantidad total de productos
-  	cantReg=$(wc -l < tempAgrupado)
-
-	#Genero el archivo salida.json en el directorio enviado por parametro -o
-  	awk -f jsonGeneratorAwk.awk -v cantReg="$cantReg" tempAgrupado > "$dirSalida/salida.json"
-
-  	#Elimino el archivo temporal de agrupamiento
-	rm tempAgrupado
+	procesarSucursales
+	borrarTemporales
+	mostrarSucursalesVacias
 fi

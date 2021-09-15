@@ -66,9 +66,10 @@ validarDiaSemana() {
     semana=(lunes martes miercoles jueves viernes sabado domingo)
     semanaIngles=(monday tuesday wednesday thursday friday saturday sunday)
     flag=0
+
     for i in "${!semana[@]}"
     do
-        if [[ ${1,,} == ${semana[i]} || ${1,,} == ${semanaIngles[i]} ]]; then
+        if [[ ${nombreDia,,} == ${semana[i]} || ${1,,} == ${semanaIngles[i]} ]]; then
             flag=1;
         fi
     done
@@ -140,8 +141,12 @@ renombrarArchivos() {
 
         # Determina el dia de la semana y lo convierto a minuscula
         nombre_dia=$(date -d $date +%A)
+        
+        # Remuevo las tildes que me devuelve el comando -date -d
+        nombre_dia=$(echo "$nombre_dia" | iconv -f utf8 -t ascii//TRANSLIT)
+
+        # Convierto el nombre del dia a minuscula
         nombre_dia=${nombre_dia,}
-        echo "$nombre_dia"
 
         # Formatea la fecha
         date="${date:0:4}-${date:4:2}-${date:6:2}" 

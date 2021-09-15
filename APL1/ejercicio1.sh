@@ -125,3 +125,4 @@ printf "%s\n" "$(cut -d '-' -f 2 <<<${CANDIDATES[*]})"
 #
 # 8. Si el script es ejecutado sin ningun parametro, se llamara a funcB, la cual devolvera un mensaje de error.
 # Al no colocar "exit 1" en funcB, el script ejecutara su contenido y mostrara un array vacio (CANDIDATES).
+

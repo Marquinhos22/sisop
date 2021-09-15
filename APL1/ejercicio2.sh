@@ -3,8 +3,8 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#          Ejercicio Nº 2         #
+	#           ejercicio2.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
@@ -38,15 +38,15 @@ Uso: ./ejercicio2.sh <-p directorio> [-d diaDeLaSemana]
 Ejemplo: ./ejercicio2.sh -p APL1/ -d martes
 
 #PARAMETROS#
-    -p, --path directorio: directorio donde se encuentran los archivos.
-    [-d, --dia diaDeLaSemana]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
-	-h | -? | -help: ayuda sobre el script
+    -p | --path directorio: directorio donde se encuentran los archivos.
+    -d | --dia diaDeLaSemana: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+	-h | -? | -help: ayuda sobre el script.
 
 #ACLARACIONES#
 - El dia de la semana a excluir se puede ingresar en español o en ingles
 "
 
-uso="Uso del script: ./ejercicio2.sh <-p> [-d]"
+uso="Uso del script: ./ejercicio2.sh <-p directorio> [-d diaDeLaSemana]"
 # ---------------------------------- FIN AYUDA ----------------------------------
 
 # ---------------------------------- FUNCIONES ----------------------------------

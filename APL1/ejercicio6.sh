@@ -3,8 +3,8 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#          Ejercicio Nº 6         #
+	#           ejercicio6.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
@@ -30,7 +30,7 @@ ayuda="
 Ayuda correspondiente al script ejercicio6.sh
 
 #OBJETIVO PRINCIPAL#
-Este script permite, dados 2 numeros reales, realizar operaciones matematicas basicas sobre ellos
+Este script permite, dados 2 numeros reales, realizar operaciones matematicas basicas sobre ellos.
 
 #USO#
 Uso: ./ejercicio6.sh < -n1 nnnn -n2 nnnn -suma | -resta | -multiplicacion | -division >
@@ -39,8 +39,8 @@ Ejemplo: ./ejercicio6.sh -n1 2 -n2 2 -suma
 #PARAMETROS#
 	-n1 nnnn: primer operando.
 	-n2 nnnn: segundo operando.
-	-suma | -resta | -multiplicacion | -division: tipo de operacion matematica a realizar
-	-h | -? | -help: ayuda sobre el script
+	-suma | -resta | -multiplicacion | -division: tipo de operacion matematica a realizar.
+	-h | -? | -help: ayuda sobre el script.
 
 #ACLARACIONES#
 - Todos los parametros del script son obligatorios.
@@ -138,13 +138,13 @@ fi
 # ---------------------------------- PROGRAMA ----------------------------------
 while true; do
 	case "$1" in
-		-n1) validarNumeroReal $2 ; n1=$2 ; shift ; shift ;; # Guardamos el operando en la variable correspondiente
-		-n2) validarNumeroReal $2 ; n2=$2 ; shift ; shift ;; # Guardamos el operando en la variable correspondiente
-		-suma) validarParametros $n1 $n2; suma $n1 $n2 ;;
-		-resta) validarParametros $n1 $n2; resta $n1 $n2 ;;
-		-division) validarParametros $n1 $n2; division $n1 $n2 ;;
-		-multiplicacion) validarParametros $n1 $n2; multiplicacion $n1 $n2 ;;
-		* ) echo "$uso" ; exit 1; break ;;
+		-n1) validarNumeroReal $2 ; n1=$2 ; shift ; shift ;;
+		-n2) validarNumeroReal $2 ; n2=$2 ; shift ; shift ;;
+		-suma) validarParametros $n1 $n2 ; suma $n1 $n2 ;;
+		-resta) validarParametros $n1 $n2 ; resta $n1 $n2 ;;
+		-division) validarParametros $n1 $n2 ; division $n1 $n2 ;;
+		-multiplicacion) validarParametros $n1 $n2 ; multiplicacion $n1 $n2 ;;
+		* ) echo "$uso" ; exit 1 ; break ;;
 	esac
 done
 # ---------------------------------- FIN PROGRAMA ----------------------------------

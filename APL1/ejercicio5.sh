@@ -3,8 +3,8 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#          Ejercicio Nº 5         #
+	#           ejercicio5.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
@@ -39,8 +39,8 @@ Uso: ./ejercicio5.sh archivoDeConfiguracion.txt
 Ejemplo: ./ejercicio5.sh ./Configuracion/configuracion.txt
 
 #PARAMETROS#
-	archivoDeConfiguracion.txt: archivo .txt con los directorios correspondientes
-	-h | -? | -help: ayuda sobre el script
+	archivoDeConfiguracion.txt: archivo .txt con los directorios correspondientes.
+	-h | -? | -help: ayuda sobre el script.
 
 #ACLARACIONES#
 - El archivo de configuracion debe tener la siguiente estructura:
@@ -48,7 +48,7 @@ Ejemplo: ./ejercicio5.sh ./Configuracion/configuracion.txt
 	- A partir de la segunda linea, las rutas donde se encuentran las carpetas de logs a analizar
 "
 
-uso="Uso del script: ./ejercicio5.sh archivoDeConfiguracion.txt"
+uso="Uso del script: ./ejercicio5.sh <archivoDeConfiguracion.txt>"
 # ---------------------------------- FIN AYUDA ----------------------------------
 
 # ---------------------------------- FUNCIONES ----------------------------------

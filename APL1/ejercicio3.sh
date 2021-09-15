@@ -3,8 +3,8 @@
 	###################################
 	#                                 #
 	#        Trabajo Práctico 1       #
-	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#          Ejercicio Nº 3         #
+	#           ejercicio3.sh         #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #
@@ -41,10 +41,10 @@ Ejemplo para ejecutar el demonio: ./ejercicio3.sh -p APL1/ -d martes
 Ejemplo para detener el demonio: ./ejercicio3.sh -k
 
 #PARAMETROS#
-    -p, --path directorio: directorio donde se encuentran los archivos.
-    [-d, --dia diaDeLaSemana]: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
-    [-k]: detiene el demonio si es que se esta ejecutando
-	-h | -? | -help: ayuda sobre el script
+    -p | --path directorio: directorio donde se encuentran los archivos.
+    -d | --dia diaDeLaSemana: nombre de un dia para el cual no se quieren renombrar los archivos. Acepta minuscula y mayuscula. Sin tildes.
+    -k: detiene el demonio si es que se esta ejecutando.
+	-h | -? | -help: ayuda sobre el script.
 
 
 #ACLARACIONES#
@@ -203,7 +203,6 @@ fi
 if [[ $# > 4 ]]; then
 	help "Error en la cantidad de parametros"
 fi
-
 # ---------------------------------- FIN VALIDACIONES ----------------------------------
 
 # ---------------------------------- PROGRAMA ----------------------------------

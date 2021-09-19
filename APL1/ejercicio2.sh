@@ -21,7 +21,7 @@
 	# Sullca, Fernando Willian        #
 	# DNI: 37.841.788		  	      #
 	#                                 #
-	# 	      1º Entrega     	  	  #
+	# 	      1º Reentrega     	  	  #
 	#                                 #
 	###################################
 

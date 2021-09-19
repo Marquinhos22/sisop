@@ -65,13 +65,14 @@ help() {
 
 # Funcion que valida si el parametro pasado es un directorio (y su existencia como path)
 validarDirectorio() {
-	echo "$1"
+	echo \"$1\" 
 	if [[ ! -d "$1" ]]; then
-		help "La ruta provista en el archivo de configuracion no es directorio valido"
+		echo "---------------"
+		help " La ruta provista: \"$1\"  en el archivo de configuracion no es directorio valido"
 	elif [[ ! -e "$1" ]]; then
-        help "No existe la ruta al archivo"
+        help "No existe la ruta al archivo  \"$1\" "
 	elif [[ ! -r "$1" || ! -w "$1" ]]; then
-        help "No se tienen los permisos necesarios sobre el directorio"
+        help "No se tienen los permisos necesarios sobre el directorio  \"$1\" "
 	fi
 }
 
@@ -84,16 +85,21 @@ obtenerPathAbsoluto() {
 verificarArchivoDeConfiguracion() {
 	if [[ -f "$1" ]]; then
 		if [[ "$1" != *.txt ]]; then
-			help "El archivo pasado no corresponde a un archivo de configuracion"
+			help "El archivo pasado: \"$1\" no corresponde a un archivo de configuracion"
 			exit 1;
 		fi
 	else
-		help "El archivo pasado no existe"
+		help "El archivo pasado: \"$1\"  no existe"
 	fi
 }
 # ---------------------------------- FIN FUNCIONES ----------------------------------
 
 # ---------------------------------- VALIDACIONES ----------------------------------
+# Muevo directorios por si llaman al script desde un lugar relativo
+scriptPath=`realpath $0`
+scriptPath=`dirname "$scriptPath"`
+cd "$scriptPath"
+
 # Si no se pasaron parametros al script se informa error
 if [[ $# == 0 ]]; then
 	help "El script requiere parametros para funcionar"
@@ -117,41 +123,52 @@ fi
 
 # ---------------------------------- PROGRAMA ----------------------------------
 # Obtengo el directorio de destino de los .zip y lo valido (si es una ruta valida y si es un directorio)
-directorioDestino=$(awk 'FNR==1 { print $0 }' "$1")
-validarDirectorio "$directorioDestino"
-echo "DIRECTORIO DESTINO: $directorioDestino"
-directorioDestino=$(obtenerPathAbsoluto "$directorioDestino")
+# Se cambio al awk anterior para leer la linea completa del archivo y validar desde el inicio
+while IFS= read -r line
+do
 
-# Obtengo el nombre del directorio padre de cada una de las rutas de directorios de logs
-nombresDirPadre=(`awk 'BEGIN { FS = "/" } ; NR>1 {print $(NF-1)}' "$1"`)
+	# Valido (si es una ruta valida y si es un directorio) la linea que obtengo en la lectura
+	validarDirectorio "$line"
+	listaDirBases+=("$line")
+done <"$1"
 
-# Creo un array conteniendo los nombres de los archivos .zip a crear
-nombreZips=()
-for i in "${!nombresDirPadre[@]}"; do
-	Contador=`expr $i + 2 `
+# Empiezo a separar las rutas segun destino y lectura
+directorioDestino=`obtenerPathAbsoluto "${listaDirBases[0]}"`
 
-	# Obtengo los directorios en donde se encuentran los logs a tratar y los valido
-	listaDirectorio=$(awk ' NR=='$Contador' { print $0 }' "$1")
+# Separo las rutas segun lectura para que coincidan los subindices con los obtenidos en el awk (desde [1]->>>[n])
+directoriosZip=("${listaDirBases[@]:1:${#listaDirBases[@]}}")
 
-	# Valido si el directorio existe o no
-	validarDirectorio "$listaDirectorio"
+#Controlar los subindice del array
+Contador=0
+#Controlar las iteraciones del awk
+Control=1
 
-	# Obtengo el path absoluto del directorio
-	listaDirectoriosBase[$i]=`obtenerPathAbsoluto "$listaDirectorio"`
+while [ "$Control" -le "${#directoriosZip[@]}" ]; 
+do	
+	listaDirectoriosBase[$Contador]=`obtenerPathAbsoluto "${directoriosZip[Contador]}"`
+	let Control=$Control+1
+	let Contador=$Contador+1
+
+	# Obtengo los directorios padre de los archivo para generar el nombre del zip
+	NombreBaseZip=`awk 'BEGIN { FS = "/" } ; NR=='$Control' {print $(NF-1)}' "$1"`
 
 	# Obtengo la fecha actual
 	fec=$(printf '%(%Y%m%d_%H%M%S)T')
-	
-	# Genero el nombre del archivo .zip correspondiente
-	ITEM=logs_"${nombresDirPadre[i]}""_$fec.zip"
 
-	# Agrego el ITEM al array
-	nombreZips+=("$ITEM")
+	# Genero el nombre del archivo .zip correspondiente
+	ITEM=logs_"$NombreBaseZip""_$fec.zip"
+
+	listanombreZips+=("$ITEM")
 done
 
 # Entro en cada directorio para buscar los logs viejos, los zipeo y guardo en la carpeta de destino. Finalmente, los elimino
 for i in "${!listaDirectoriosBase[@]}"; do
 	cd "${listaDirectoriosBase[i]}"
-	find . -daystart -mtime +1  -iname '*.txt' -o -iname '*.log' -o -iname '*.info' | zip -rm "$directorioDestino/${nombreZips[i]}" -@ 
+
+	# El siguiente find nos genero ciertas inconsistencias con los archivos del dia anterior a la ejecucion del script, segun su hora de modificacion
+	#find . -daystart -mtime +1  -iname '*.txt' -o -iname '*.log' -o -iname '*.info' | -rm zip "$directorioDestino/${listanombreZips[i]}" -@ 
+
+	# Busco los archivos que no son mas recientes que la fecha actual (00:00:00)
+	find . ! -newermt '00:00:00'  -iname '*.txt' -o -iname '*.log' -o -iname '*.info' | -rm zip "$directorioDestino/${listanombreZips[i]}" -@ 
 done
 # ---------------------------------- FIN PROGRAMA ----------------------------------

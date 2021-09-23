@@ -1,0 +1,5 @@
+./Pruebas/Lote-Ej5/tmp/viejos logs
+./Pruebas/Lote-Ej5/tmp/servicios/archivos busqueda/logs
+./Pruebas/Lote-Ej5/tmp/servicios/archivos cargas/registros logs
+./Pruebas/Lote-Ej5/tmp/servicios/ubicaciones/temporales
+./Pruebas/Lote-Ej5/tmp/servicios/busqueda/logs

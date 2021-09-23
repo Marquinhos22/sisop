@@ -2,7 +2,7 @@
 	#                                 #
 	#        Trabajo Práctico 2       #
 	#          Ejercicio Nº 1         #
-	#           ejercicio1.sh         #
+	#            1_APL2.ps1           #
 	#                                 #
 	# Cammarano, Santiago             #
 	# DNI: 41.582.407                 #

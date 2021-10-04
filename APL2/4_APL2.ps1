@@ -52,7 +52,7 @@ Param
     [string]$excluir
 )
 
-#Validacion de path de entrada
+# Validacion de path de entrada
 if (!(Test-Path -Path $directorio -IsValid)) {
     Write-Error -Message "El directorio '$directorio' no existe."
     exit -1
@@ -63,7 +63,7 @@ if (!(Test-Path -Path $out -IsValid)) {
     exit -1
 }
 
-#Validacio que la entrada y salida no sean los mismos directorios
+# Validacion que la entrada y salida no sean los mismos directorios
 
 $pathSalida = Resolve-path $out
 $pathEntrada = Resolve-path $directorio
@@ -77,7 +77,7 @@ if (!(compare-object -Referenceobject  $pathSalida -DifferenceObject $pathEntrad
 $productosSucursales = @{}
 $sucursalesVacias = [System.Collections.ArrayList]::new()
 
-#Recorro el directorio de entrada (recursivamente) filtrando por archivos.csv y excluyendo la sucursal -excluir  
+# Recorro el directorio de entrada (recursivamente) filtrando por archivos.csv y excluyendo la sucursal -excluir  
 Get-ChildItem $pathEntrada -Recurse -Filter *.csv -Exclude $excluir'.csv'  | Foreach-Object {
 
     #Si el csv esta vacio o solo tiene cabecera, guardo nombre de sucursal
@@ -85,27 +85,27 @@ Get-ChildItem $pathEntrada -Recurse -Filter *.csv -Exclude $excluir'.csv'  | For
         [void]$sucursalesVacias.Add($_.BaseName)
     }
     else {
-        #Recorro archivo .csv
+        # Recorro archivo .csv
         Import-Csv $_.fullname -Delimiter ',' | ForEach-Object {
             $producto = $_.NombreProducto
             $importe = [int]$_.ImporteRecaudado
             
-            #Si el producto ya se encuentra en el hashtable, sumo su importe, sino agrego producto e importe
+            # Si el producto ya se encuentra en el hashtable, sumo su importe, sino agrego producto e importe
             if ($productosSucursales.ContainsKey($producto)) {
                 $productosSucursales[$producto] = $productosSucursales[$producto] + $importe 
             }
             else {
-                #El nombre de producto lo tomo con la norma: primera letra mayuscula y despues minusculas
+                # El nombre de producto lo tomo con la norma: primera letra mayuscula y despues minusculas
                 [void]$productosSucursales.Add($producto.substring(0,1).toupper()+$producto.substring(1).tolower(),$importe)
             }  
         }
     }    
 } 
 
-#Creo el archivo salida.json ordenado por nombre de productos en la carpeta de salida
+# Creo el archivo salida.json ordenado por nombre de productos en la carpeta de salida
 $productosSucursales | Sort-Object |ConvertTo-Json -Compress > $pathSalida'/salida.json'
 
-#Si se encontraron archivos vacios muestro el listado 
+# Si se encontraron archivos vacios muestro el listado 
 if ( $sucursalesVacias.Count -ne 0 ){
 
     Write-Output "Las siguientes sucursales tuvieron problemas y estan vacias:"

@@ -1,8 +1,8 @@
 ###################################
 #                                 #
 #        Trabajo Práctico 2       #
-#          Ejercicio Nº 2         #
-#            2_APL2.ps1           #
+#          Ejercicio Nº 5         #
+#            5_APL2.ps1           #
 #                                 #
 # Cammarano, Santiago             #
 # DNI: 41.582.407                 #
@@ -25,7 +25,6 @@
 # ---------------------------------- AYUDA ---------------------------------- #
 
 <#
-
 .SYNOPSIS
 Ayuda correspondiente al script 5_APL2.ps1
 Este script permite generar archivos .zip en base a logs viejos almacenados en rutas provistas en un archivo de configuracion.
@@ -40,76 +39,70 @@ Se considera antiguo a un archivo de log que no fue creado el día en el que se 
 Directorio donde se encuentran el archivo de configuracion.
     
 .EXAMPLE
-./2_APL2.ps1 -Directorio ".<archivoDeConfiguracion.txt>"
-
+./5_APL2.ps1 -Directorio ".<archivoDeConfiguracion.txt>"
 #>
 
 # ---------------------------------- FIN AYUDA ---------------------------------- #
 
-# ------------ Validaciones ---------------- #
+# ---------------------------------- VALIDACIONES ---------------------------------- #
 Param (
-[Parameter(Mandatory=$true, Position = 1, ParameterSetName="Directorio")] 
-[ValidateScript({
-    if( -Not ("$_" | Test-Path) ){
-        throw "Archivo no existe"
-    }
-    return $true
-})]
-[System.String] $Directorio
+    [Parameter(Mandatory = $true, Position = 1, ParameterSetName = "Directorio")] 
+    [ValidateScript({
+            if ( -Not ("$_" | Test-Path) ) {
+                throw "El archivo de configuracion pasado por parametros no existe"
+            }
+            return $true
+        })]
+    [System.String] $Directorio
 )
-#Convert-Path .
 
-#$Ruta=Join-Path -Path $(Get-Location) -ChildPath $Directorio
-#salida----->C:\Users\fernando\Desktop\APL 2 ejercicio 5\.\tmp\viejos_logs
-#$locacion=Get-Location
-#salida----->C:\Users\fernando\Desktop\APL 2 ejercicio 5\.
-$FILE = Get-Content "$Directorio"# File sera el contenedor del contenido(paths)
+# File sera el contenedor del contenido del archivo de configuracion (paths)
+$FILE = Get-Content "$Directorio"
 $FileAbsoluto = New-Object -TypeName "System.Collections.ArrayList" 
 $FileZip = New-Object -TypeName "System.Collections.ArrayList" 
-foreach ($LINE in $FILE) # Verificar las rutas(paths) obtenidas
-{
-        #Join-Path -Path $(Get-Location) -ChildPath $LINE
-        #C:\Users\fernando\Desktop\APL 2 ejercicio 5\.\tmp\servicios\ubicaciones\temporales
-       
-        #write-Host "El directorios $([io.path]::GetFullPath($LINE)) no existe"
-        #salida---->El directorios C:\Users\fernando\tmp\servicios\busqueda\logs no existe
-        if( -Not (Resolve-Path $LINE) ){
-        Write-error "El directorio obtenido del archivo de configuracion no existe"
-        return false;
+$esDirDest = $true
+
+# Verificar las rutas (paths) obtenidas
+foreach ($LINE in $FILE) {
+
+    if ( -Not (Resolve-Path $LINE) ) {
+        Write-error "El directorio $($LINE) obtenido del archivo de configuracion no existe"
+        exit 1
+    }
+    else {
+        # Si exite el path, tratar de generar los zip namebase
+        # [void] --> para evitar que ArrayList.Add devuelva el indice del nuevo elemento agregado
+        [void]$FileAbsoluto.Add($(Resolve-Path $LINE))
+        if ( -Not ($esDirDest) ) {
+            $date = get-date
+            [void]$FileZip.Add("logs_$([io.path]::GetFileName( [io.path]::GetDirectoryName($LINE)))_$($date.ToString("yyyyMMdd_HHmmss")).zip")
         }
-        else{#Si exite, tratar de generar los zip namebase
-        #[io.path]::GetFileName( [io.path]::GetDirectoryName($LINE))
-        $date=get-date
-        #yyyyMMdd_HHmmss
-        #$date.ToString("yyyyMMdd_HHmmss")
-        $FileZip.Add("Log_$([io.path]::GetFileName( [io.path]::GetDirectoryName($LINE)))_$($date.ToString("yyyyMMdd_HHmmss")).zip")
-        #[io.path]::GetDirectoryName($LINE)
-        #$LINE | Select-Object -Property @{name='NAME';expression={$LINE}}
-        } 
+    } 
+    $esDirDest = $false
 }
 
+$SubdirDest = $FileAbsoluto[0] # Ruta destino
+$SubdirZIP = $FileAbsoluto[1..($FileAbsoluto.count - 1)] # Ruta origen donde estan los logs
+# ---------------------------------- FIN VALIDACIONES ---------------------------------- #
 
-#$Global:dir="" 
-#$Global:=".zip" 
-# ------------Fin de Validaciones --------------------------- #
+# ---------------------------------- MAIN ---------------------------------- #
+$control = 0;
 
-#---------------------Proceso principal-----------------------#
-foreach ($LINE in $FileZip) # Verificar las rutas(paths) obtenidas
-{
-Write-output $LINE
+# Verificar las rutas (paths) obtenidas y filtrado de archivo por cada carpeta
+foreach ($LINE in $SubdirZIP) {
+    # Obtengo la fecha actual
+    $date = get-date
+
+    $destino = Join-Path -Path $SubdirDest -ChildPath $($FileZip[$control])
+    write-Host  $destino
+
+    # Genero el .zip
+    get-ChildItem $LINE | where-object { $_.lastwritetime -lt [datetime]::parse($($date.ToString("dd/MM/yy"))) } | Compress-Archive -DestinationPath  "$destino"
+
+    # Elimino los archivos zipeados
+    get-ChildItem $LINE | where-object { $_.lastwritetime -lt [datetime]::parse($($date.ToString("dd/MM/yy"))) } | remove-item -Force | Out-Null
+
+    $control = $control + 1
 }
-foreach ($LINE in $FILE) # Verificar las rutas(paths) obtenidas
-{
-$date=get-date
-$($date.ToString("dd/MM/yy"))
-write-Host $LINE
-$directoriosFiltradosAntiguos= get-ChildItem $LINE| where-object {$_.lastwritetime -lt [datetime]::parse($($date.ToString("dd/MM/yy")))}
-write-Host $directoriosFiltradosAntiguos
-}
+# ---------------------------------- FIN MAIN ---------------------------------- #
 
-#------------------------Prototipo de zippeo-----------------------
-#Add-Type -Assembly System.IO.Compression.FileSystem
-#$compressionLevel = [System.IO.Compression.CompressionLevel]::Fastest
-#[System.IO.Compression.ZipFile]::CreateFromDirectory("$dirPapelera", "$dirPapeleraCompr", $compressionLevel, $false)
-#No se usa Compress-Archive -CompressionLevel Fastest -Path "$dirPapelera" -DestinationPath "$dirPapeleraCompr" | Out-Null
-#remove-item -Force -Recurse $Global:dirPapelera | Out-Null

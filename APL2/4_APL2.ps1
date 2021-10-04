@@ -39,6 +39,9 @@ Ejemplo de ejecucion: ./ejersicio4.ps1 -directorio 'PathsCSV' -out /home/usuario
 Genera un archivo Json con el acta generada en el path indicado en el segundo parametro.
 #> 
 
+# ---------------------------------- FIN AYUDA ---------------------------------- #
+
+# ---------------------------------- VALIDACIONES ---------------------------------- #
 Param
 (
     [parameter(Mandatory = $true)]
@@ -57,6 +60,7 @@ if (!(Test-Path -Path $directorio -IsValid)) {
     Write-Error -Message "El directorio '$directorio' no existe."
     exit -1
 }
+
 #Validacion de path de salida
 if (!(Test-Path -Path $out -IsValid)) {
     Write-Error "La sintaxis del directorio '$out' no es correcta."
@@ -64,7 +68,6 @@ if (!(Test-Path -Path $out -IsValid)) {
 }
 
 # Validacion que la entrada y salida no sean los mismos directorios
-
 $pathSalida = Resolve-path $out
 $pathEntrada = Resolve-path $directorio
 
@@ -72,8 +75,9 @@ if (!(compare-object -Referenceobject  $pathSalida -DifferenceObject $pathEntrad
     Write-Error "Los directorios -directorios y -out no pueden ser los mismos."
     exit -1
 }
+# ---------------------------------- FIN VALIDACIONES ---------------------------------- #
 
-
+# ---------------------------------- MAIN ---------------------------------- #
 $productosSucursales = @{}
 $sucursalesVacias = [System.Collections.ArrayList]::new()
 
@@ -111,3 +115,4 @@ if ( $sucursalesVacias.Count -ne 0 ){
     Write-Output "Las siguientes sucursales tuvieron problemas y estan vacias:"
     $sucursalesVacias | Format-Table | Sort-Object
 }
+# ---------------------------------- FIN MAIN ---------------------------------- #

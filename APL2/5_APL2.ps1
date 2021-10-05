@@ -1,40 +1,42 @@
-###################################
-#                                 #
-#        Trabajo Práctico 2       #
-#          Ejercicio Nº 5         #
-#            5_APL2.ps1           #
-#                                 #
-# Cammarano, Santiago             #
-# DNI: 41.582.407                 #
-#                                 #
-# Martel, Lucas                   #
-# DNI: 39.348.436                 #
-#                                 #
-# Ramos, Marcos Gerardo           #
-# DNI: 35.896.637                 #
-#                                 #
-# Rius Conde, Lucio        	  	  #
-# DNI: 41.779.534 		  		  #
-# 				  				  #
-# Sullca, Fernando Willian        #
-# DNI: 37.841.788		  	      #
-#                                 #
-# 	      1º Entrega     	  	  #
-#                                 #
-###################################
+    ###################################
+    #                                 #
+    #        Trabajo Práctico 2       #
+    #          Ejercicio Nº 5         #
+    #            5_APL2.ps1           #
+    #                                 #
+    # Cammarano, Santiago             #
+    # DNI: 41.582.407                 #
+    #                                 #
+    # Martel, Lucas                   #
+    # DNI: 39.348.436                 #
+    #                                 #
+    # Ramos, Marcos Gerardo           #
+    # DNI: 35.896.637                 #
+    #                                 #
+    # Rius Conde, Lucio        	  	  #
+    # DNI: 41.779.534 		  		  #
+    # 				  				  #
+    # Sullca, Fernando Willian        #
+    # DNI: 37.841.788		  	      #
+    #                                 #
+    # 	      1º Entrega     	  	  #
+    #                                 #
+    ###################################
 # ---------------------------------- AYUDA ---------------------------------- #
 
 <#
 .SYNOPSIS
-Ayuda correspondiente al script 5_APL2.ps1
 Este script permite generar archivos .zip en base a logs viejos almacenados en rutas provistas en un archivo de configuracion.
-Una vez comprimidos, los archivos se deben eliminar para ahorrar espacio en el disco del servidor. 
-Se considera antiguo a un archivo de log que no fue creado el día en el que se corre el script(24 hs).
 
 .DESCRIPTION
+Este script permite generar archivos .zip en base a logs viejos almacenados en rutas provistas en un archivo de configuracion.
+Una vez comprimidos, los archivos se eliminan para ahorrar espacio en el disco del servidor. 
+Se considera antiguo a un archivo de log que no fue creado el día en el que se corre el script (24 hs).
+
 - El archivo de configuracion debe tener la siguiente estructura:
 	- En la primera linea la carpeta de destino de los archivos comprimidos
 	- A partir de la segunda linea, las rutas donde se encuentran las carpetas de logs a analizar.
+
 .PARAMETER Directorio
 Directorio donde se encuentran el archivo de configuracion.
     

@@ -25,18 +25,39 @@
 # ---------------------------------- AYUDA ---------------------------------- #
 
 <#
-.Description
+.SYNOPSIS
 Este script consolida y procesa los archivos .csv de ventas de sucursales en un unico archivo .json
-.Inputs
+
+.DESCRIPTION
+Este script consolida y procesa los archivos .csv de ventas de sucursales en un unico archivo .json
+    - El archivo de salida .json estara ordenado alfabeticamente
+    - Se informaran las sucursales que no contengan datos de entrada
+
+.INPUTS
 1. -directorio: Directorio donde se encuentran los archivos CSV a procesar. Se analizaran también subdirectorios.
 2. -out: Directorio donde se desea guardar el archivo resultante 'salida.json'
 3. -excluir: Nombre de archivo de sucursal a excluir.
-.Example
-Uso: ./ejercicio4.ps1 <-directorio directorioEntrada> [-excluir sucursal] <-out directorioSalida>
-Ejemplo de ejecucion: ./ejersicio4.ps1 -directorio 'lotePrueba' -excluir 'Moron' -out 'Salida'
-Ejemplo de ejecucion: ./ejersicio4.ps1 -directorio 'PathsCSV' -out /home/usuario/dirSalida
+
+.PARAMETER Directorio
+Directorio donde se encuentran los archivos CSV a procesar. Se analizaran también subdirectorios.
+
+.PARAMETER Out
+Directorio donde se desea guardar el archivo resultante 'salida.json'
+
+.PARAMETER Excluir
+(Opcional) Nombre de archivo de sucursal a excluir.
+
+.EXAMPLE
+./4_APL2.ps1 <-directorio directorioEntrada> [-excluir sucursal] <-out directorioSalida>
+
+.EXAMPLE
+./4_APL2.ps1 -directorio 'lotePrueba' -excluir 'Moron' -out 'Salida'
+
+.EXAMPLE
+./4_APL2.ps1 -directorio 'PathsCSV' -out /home/usuario/dirSalida
+
 .OUTPUTS
-Genera un archivo Json con el acta generada en el path indicado en el segundo parametro.
+Genera un archivo Json con el acta generada en el path indicado en el parametro -out.
 #> 
 
 # ---------------------------------- FIN AYUDA ---------------------------------- #

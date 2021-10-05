@@ -27,7 +27,6 @@
 
 [CmdletBinding()]
 
-
 <# 
 El script recibe dos parámetros, los cuales no son obligatorios:
     -dirAExaminar
